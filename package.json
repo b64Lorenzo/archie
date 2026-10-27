@@ -1,0 +1,17 @@
+{
+  "name": "archive-manager",
+  "version": "1.0.2",
+  "description": "Archive Management System by Lorenzo Zambelli",
+  "author": "Lorenzo Zambelli",
+  "license": "MIT",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "set PATH=%USERPROFILE%\\.cargo\\bin;%PATH% && tauri dev",
+    "build": "set PATH=%USERPROFILE%\\.cargo\\bin;%PATH% && tauri build",
+    "build:debug": "set PATH=%USERPROFILE%\\.cargo\\bin;%PATH% && tauri build --debug"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

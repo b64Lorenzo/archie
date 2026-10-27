@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archie</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="36" rx="8" fill="currentColor" fill-opacity="0.1"/>
+                        <rect x="7" y="7" width="14" height="22" rx="3" fill="currentColor" fill-opacity="0.9"/>
+                        <rect x="13" y="9" width="14" height="20" rx="2" fill="#f0f0f5" fill-opacity="0.9"/>
+                        <line x1="10" y1="13" x2="17" y2="13" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <line x1="10" y1="17" x2="17" y2="17" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <line x1="10" y1="21" x2="17" y2="21" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <polygon points="22,7 29,7 29,14 25.5,10.5 22,14" fill="#e5c07b"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">Archie</div>
+                    <div class="logo-subtitle">v1.0.2</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="home">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text" data-i18n="home">Home</span>
+                </a>
+                <a href="#" class="nav-item" data-page="files">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-text" data-i18n="filesView">Files</span>
+                </a>
+                <a href="#" class="nav-item" data-page="duplicates">
+                    <span class="nav-icon">⚠️</span>
+                    <span class="nav-text" data-i18n="duplicates">Duplicates</span>
+                </a>
+                <a href="#" class="nav-item" data-page="topics">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text" data-i18n="topicsView">Topics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label" data-i18n="emptyTree">Directory Tree</div>
+                <div class="tree-container">
+                    <div id="directoryTree" class="tree"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="author-note">Lorenzo Zambelli</div>
+            </div>
+        </aside>
+        <div id="sidebarResize" class="sidebar-resize" title="Resize sidebar"></div>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-path">
+                    <span class="path-icon">📍</span>
+                    <input type="text" id="pathInput" class="path-input" data-i18n-placeholder="selectDir" placeholder="Select a directory to scan..." autocomplete="off">
+                    <button id="scanBtn" class="btn btn-primary" data-i18n="scanDir">Scan</button>
+                    <button id="refreshBtn" class="btn btn-secondary">🔄</button>
+                    <button id="browseBtn" class="btn btn-secondary">📁</button>
+                    <select id="languageSelect" class="language-select">
+                        <option value="en">EN</option>
+                        <option value="it">IT</option>
+                    </select>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFiles">0</div>
+                        <div class="stat-label" data-i18n="files">Files</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFolders">0</div>
+                        <div class="stat-label" data-i18n="folders">Folders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSize">0 B</div>
+                        <div class="stat-label" data-i18n="size">Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDups">0</div>
+                        <div class="stat-label" data-i18n="dupGroups">Dup Groups</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCode">0</div>
+                        <div class="stat-label" data-i18n="codeFiles">Code Files</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Pages -->
+            <div class="pages">
+                <!-- Home Page -->
+                <div id="page-home" class="page active">
+                    <div class="home-page">
+                        <!-- Entry state -->
+                        <div id="homeEntry" class="home-card">
+                            <div class="home-icon">
+                                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 16h28l6 6h24v36H8V16z" stroke="currentColor" stroke-width="3" fill="currentColor" fill-opacity="0.1"/>
+                                    <path d="M8 22h48" stroke="currentColor" stroke-width="3"/>
+                                </svg>
+                            </div>
+                            <div class="home-title" data-i18n="selectAndScan">Select a directory to scan</div>
+                            <div class="home-path-row">
+                                <input type="text" id="homePathInput" class="path-input" data-i18n-placeholder="enterPath" placeholder="Enter folder path, or click Browse..." autocomplete="off">
+                                <button id="homeBrowseBtn" class="btn btn-secondary" data-i18n="browse">Browse</button>
+                                <div id="pathAutocomplete" class="autocomplete-dropdown"></div>
+                            </div>
+                            <button id="homeScanBtn" class="btn btn-primary btn-large" data-i18n="scan">Scan Directory</button>
+                            <div id="recentPaths" class="recent-paths"></div>
+                        </div>
+
+                        <!-- Dashboard state -->
+                        <div id="homeDashboard" class="home-content" style="display:none;">
+                            <section class="home-chart analysis-panel"><h2 data-i18n="largestFiles">Largest files</h2><p data-i18n="reviewLargest">Review the ten largest files in this scan. Select a file to inspect it.</p><div id="largestFiles"></div></section>
+                            <div class="home-chart-wrap">
+                                <div class="home-chart">
+                                    <div class="home-chart-title" data-i18n="fileTypeDistribution">File type distribution (by size)</div>
+                                    <canvas id="typeChart" width="600" height="260" role="img" data-i18n-aria="fileTypeDistribution" aria-label="File type distribution by size"></canvas>
+                                    <div id="typeSummary" class="analysis-summary"></div>
+                                </div>
+                                <div class="home-chart">
+                                    <div class="home-chart-title" data-i18n="topExtensionsSize">Top 10 extensions by size</div>
+                                    <canvas id="extChart" width="600" height="360" role="img" data-i18n-aria="topExtensionsSize" aria-label="Top ten extensions by size"></canvas>
+                                </div>
+                                <div class="home-chart">
+                                    <div class="home-chart-title" data-i18n="topExtensionsCount">Top 10 extensions by count</div>
+                                    <canvas id="extCountChart" width="600" height="360" role="img" data-i18n-aria="topExtensionsCount" aria-label="Top ten extensions by file count"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Files Page -->
+                <div id="page-files" class="page">
+                    <div class="page-toolbar">
+                        <div class="search-box">
+                            <span class="search-icon">🔎</span>
+                            <input type="text" id="searchInput" class="search-input" data-i18n-placeholder="searchFiles" placeholder="Search files..." autocomplete="off">
+                            <div id="searchAutocomplete" class="autocomplete-dropdown"></div>
+                        </div>
+                        <button id="newFileBtn" class="btn btn-secondary" data-i18n="newFile" data-i18n-prefix="📄 ">New File</button>
+                        <button id="newFolderBtn" class="btn btn-secondary" data-i18n="newFolder" data-i18n-prefix="📁 ">New Folder</button>
+                        <button id="exportCsvBtn" class="btn btn-secondary" data-i18n="exportCsv">Export CSV</button>
+                        <select id="filterSelect" class="filter-select">
+                            <option value="All" data-i18n="all">All</option>
+                            <option value="Documents" data-i18n="documents">Documents</option>
+                            <option value="Code" data-i18n="code">Code</option>
+                            <option value="Media" data-i18n="media">Media</option>
+                            <option value="Archives" data-i18n="archives">Archives</option>
+                            <option value="Other" data-i18n="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="name" data-i18n="name">Name</th>
+                                    <th data-sort="file_type" data-i18n="type">Type</th>
+                                    <th data-sort="size" data-i18n="size">Size</th>
+                                    <th data-sort="modified" data-i18n="modified">Modified</th>
+                                    <th data-i18n="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filesTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="5" class="empty-state">
+                                        <div class="empty-content">
+                                            <div class="empty-icon">📂</div>
+                                            <div class="empty-text" data-i18n="selectAndScan">Select a directory and click Scan to view files</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevPageBtn" class="btn btn-secondary" data-i18n="prev" data-i18n-prefix="◀ ">Prev</button>
+                        <span id="pageInfo" class="page-info">Page 1 of 1</span>
+                        <button id="nextPageBtn" class="btn btn-secondary" data-i18n="next" data-i18n-suffix=" ▶">Next</button>
+                        <select id="pageSizeSelect" class="page-size-select">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100" selected>100</option>
+                            <option value="200">200</option>
+                            <option value="500">500</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tree View Page -->
+                <div id="page-tree" class="page">
+                    <div class="tree-view">
+                        <div id="treeView" class="tree-view-content"></div>
+                    </div>
+                </div>
+
+                <!-- Duplicates Page -->
+                <div id="page-duplicates" class="page">
+                    <div class="page-toolbar">
+                        <h2 class="page-title" data-i18n="duplicateFiles">Duplicate Files</h2>
+                        <button id="findDupsBtn" class="btn btn-primary" data-i18n="duplicates">Find Duplicates</button>
+                        <span id="dupCount" class="dup-count"></span>
+                        <div class="dup-actions">
+                            <button id="dupDeleteSelected" class="btn btn-danger" data-i18n="delete" data-i18n-prefix="🗑 ">Delete Selected</button>
+                            <button id="dupOpenSelected" class="btn btn-success" data-i18n="openSelected" data-i18n-prefix="📂 ">Open Selected</button>
+                            <button id="dupCopyPaths" class="btn btn-secondary" data-i18n="copyPaths" data-i18n-prefix="📋 ">Copy Paths</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="name">File Name</th>
+                                    <th data-i18n="dupGroups">Copies</th>
+                                    <th data-i18n="size">Total Size</th>
+                                    <th data-i18n="locations">Locations</th>
+                                    <th data-i18n="actions">Quick Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="duplicatesTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="5" class="empty-state">
+                                        <div class="empty-content">
+                                            <div class="empty-icon">⚠️</div>
+                                            <div class="empty-text" data-i18n="clickFindDups">Click "Find Duplicates" to scan for duplicate files</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Topics Page -->
+                <div id="page-topics" class="page">
+                    <div class="page-toolbar">
+                        <h2 class="page-title" data-i18n="topics">Topics</h2>
+                        <div class="search-box">
+                            <span class="search-icon">🔎</span>
+                            <input type="text" id="topicSearchInput" class="search-input" data-i18n-placeholder="searchTopics" placeholder="Search topics...">
+                        </div>
+                        <button id="addTopicBtn" class="btn btn-secondary" data-i18n="addTopic">+ Add Custom Topic</button>
+                    </div>
+                    <div id="topicsContainer" class="topics-container">
+                        <div class="empty-state">
+                            <div class="empty-icon">🏷️</div>
+                            <div class="empty-text" data-i18n="scanToSeeTopics">Scan a directory to see topic-based organization</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <footer class="status-bar">
+                <span id="statusText" data-i18n="ready">Ready</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Tree Context Menu -->
+    <div id="treeContextMenu" class="context-menu">
+        <a href="#" class="context-item" data-action="open" data-i18n-prefix="📂 " data-i18n="open">📂 Open File</a>
+        <a href="#" class="context-item" data-action="openFolder" data-i18n-prefix="📁 " data-i18n="folder">📁 Open Folder</a>
+        <a href="#" class="context-item" data-action="copy" data-i18n-prefix="📋 " data-i18n="copyPaths">📋 Copy Path</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="newFile" data-i18n-prefix="📄 " data-i18n="newFile">📄 New File</a>
+        <a href="#" class="context-item" data-action="newFolder" data-i18n-prefix="📁 " data-i18n="newFolder">📁 New Folder</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="rename" data-i18n-prefix="✏️ " data-i18n="rename">✏️ Rename</a>
+        <a href="#" class="context-item" data-action="delete" data-i18n-prefix="🗑️ " data-i18n="delete">🗑️ Delete</a>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <a href="#" class="context-item" data-action="open" data-i18n-prefix="📂 " data-i18n="open">📂 Open File</a>
+        <a href="#" class="context-item" data-action="openFolder" data-i18n-prefix="📁 " data-i18n="folder">📁 Open Folder</a>
+        <a href="#" class="context-item" data-action="copy" data-i18n-prefix="📋 " data-i18n="copyPaths">📋 Copy Path</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="newFile" data-i18n-prefix="📄 " data-i18n="newFile">📄 New File</a>
+        <a href="#" class="context-item" data-action="newFolder" data-i18n-prefix="📁 " data-i18n="newFolder">📁 New Folder</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="rename" data-i18n-prefix="✏️ " data-i18n="rename">✏️ Rename</a>
+        <a href="#" class="context-item" data-action="delete" data-i18n-prefix="🗑️ " data-i18n="delete">🗑️ Delete</a>
+    </div>
+
+    <!-- Duplicate Context Menu -->
+    <div id="dupContextMenu" class="context-menu">
+        <a href="#" class="context-item" data-action="open" data-i18n-prefix="📂 " data-i18n="open">📂 Open File</a>
+        <a href="#" class="context-item" data-action="openFolder" data-i18n-prefix="📁 " data-i18n="folder">📁 Open Folder</a>
+        <a href="#" class="context-item" data-action="copy" data-i18n-prefix="📋 " data-i18n="copyPaths">📋 Copy Path</a>
+        <a href="#" class="context-item" data-action="copyAll" data-i18n-prefix="📋 " data-i18n="copyAllPaths">📋 Copy All Paths</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="delete" data-i18n-prefix="🗑️ " data-i18n="deleteThisCopy">🗑️ Delete This Copy</a>
+        <a href="#" class="context-item" data-action="deleteAll" data-i18n-prefix="🗑️ " data-i18n="deleteAllCopies">🗑️ Delete All Copies</a>
+        <a href="#" class="context-item" data-action="openAll" data-i18n-prefix="📂 " data-i18n="openAllLocations">📂 Open All Locations</a>
+        <div class="context-separator"></div>
+        <a href="#" class="context-item" data-action="showExplorer" data-i18n-prefix="📁 " data-i18n="showInExplorer">📁 Show in Explorer</a>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

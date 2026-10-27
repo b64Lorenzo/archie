@@ -1,0 +1,28 @@
+{
+  "default": null,
+  "permission": [
+    {
+      "identifier": "archie",
+      "description": "Archie custom commands",
+      "commands": {
+        "allow": [
+          "scan_directory",
+          "get_tree",
+          "find_duplicates",
+          "get_topics",
+          "search_files",
+          "get_cached_filenames",
+          "open_file",
+          "open_folder",
+          "rename_file",
+          "delete_file",
+          "create_file",
+          "create_folder",
+          "pick_folder",
+          "get_app_info"
+        ],
+        "deny": []
+      }
+    }
+  ]
+}
