@@ -52,7 +52,7 @@
                 </div>
                 <div class="logo-text">
                     <div class="logo-title">Archie</div>
-                    <div class="logo-subtitle">v1.0.5</div>
+                    <div class="logo-subtitle">v1.0.6</div>
                 </div>
             </div>
             
@@ -327,6 +327,14 @@
                                 <option value="en">English</option>
                                 <option value="it">Italiano</option>
                             </select>
+                        </div>
+                        <div class="settings-group">
+                            <label class="settings-label" data-i18n="defaultTopics">Default topics</label>
+                            <div class="settings-row">
+                                <input type="text" id="defaultTopicsInput" class="settings-input" data-i18n-placeholder="defaultTopicsPlaceholder" placeholder="Add a default topic keyword...">
+                                <button id="addDefaultTopicBtn" class="btn btn-secondary" data-i18n="addDefaultTopic">Add default topic</button>
+                            </div>
+                            <ul id="defaultTopicsList" class="settings-topic-list"></ul>
                         </div>
                         <div class="settings-actions">
                             <button id="saveSettingsBtn" class="btn btn-primary" data-i18n="saveSettings">Save settings</button>

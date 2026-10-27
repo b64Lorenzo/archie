@@ -154,6 +154,10 @@ class ArchiveManager {
         settings: 'Settings',
         defaultFolder: 'Default folder',
         defaultFolderPlaceholder: 'Enter default scan folder path...',
+        defaultTopics: 'Default topics',
+        defaultTopicsPlaceholder: 'Add a default topic keyword...',
+        addDefaultTopic: 'Add default topic',
+        removeDefaultTopic: 'Remove',
         saveSettings: 'Save settings',
         settingsSaved: 'Settings saved',
         cancel: 'Cancel',
@@ -286,6 +290,10 @@ class ArchiveManager {
         settings: 'Impostazioni',
         defaultFolder: 'Cartella predefinita',
         defaultFolderPlaceholder: 'Inserisci il percorso della cartella predefinita...',
+        defaultTopics: 'Argomenti predefiniti',
+        defaultTopicsPlaceholder: 'Aggiungi parola chiave argomento predefinito...',
+        addDefaultTopic: 'Aggiungi argomento predefinito',
+        removeDefaultTopic: 'Rimuovi',
         saveSettings: 'Salva impostazioni',
         settingsSaved: 'Impostazioni salvate',
         cancel: 'Annulla',
@@ -362,10 +370,36 @@ class ArchiveManager {
   renderSettingsPage() {
     const defaultFolderInput = document.getElementById('defaultFolderInput');
     const languageSelect = document.getElementById('settingsLanguageSelect');
+    const topicsList = document.getElementById('defaultTopicsList');
     if (!defaultFolderInput || !languageSelect) return;
     const settings = this.loadSettings();
     defaultFolderInput.value = settings.defaultFolder || '';
     languageSelect.value = settings.language || 'en';
+    this.settingsDefaultTopics = [...(Array.isArray(settings.defaultTopics) ? settings.defaultTopics : [])];
+    this.renderDefaultTopicsList();
+  }
+
+  renderDefaultTopicsList() {
+    const list = document.getElementById('defaultTopicsList');
+    if (!list) return;
+    list.innerHTML = '';
+    const topics = this.settingsDefaultTopics || [];
+    topics.forEach((topic, index) => {
+      const li = document.createElement('li');
+      li.className = 'settings-topic-item';
+      const name = document.createElement('span');
+      name.className = 'topic-name';
+      name.textContent = topic;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = this.t('remove') || 'Remove';
+      removeBtn.addEventListener('click', () => {
+        this.settingsDefaultTopics.splice(index, 1);
+        this.renderDefaultTopicsList();
+      });
+      li.appendChild(name);
+      li.appendChild(removeBtn);
+      list.appendChild(li);
+    });
   }
 
   loadSettings() {
@@ -384,6 +418,7 @@ class ArchiveManager {
     const settings = {
       defaultFolder: defaultFolderInput.value.trim(),
       language: languageSelect.value,
+      defaultTopics: this.settingsDefaultTopics || [],
     };
     localStorage.setItem('archie-settings', JSON.stringify(settings));
     if (settings.language && settings.language !== this.currentLanguage) {
@@ -399,6 +434,11 @@ class ArchiveManager {
   getDefaultFolder() {
     const settings = this.loadSettings();
     return settings.defaultFolder || '';
+  }
+
+  getDefaultTopics() {
+    const settings = this.loadSettings();
+    return Array.isArray(settings.defaultTopics) ? settings.defaultTopics : [];
   }
 
   updateAllTexts() {
@@ -449,6 +489,11 @@ class ArchiveManager {
     if (defaultFolder) {
       const homePathInput = document.getElementById('homePathInput');
       if (homePathInput) homePathInput.value = defaultFolder;
+    }
+    // Load default topics
+    const defaultTopics = this.getDefaultTopics();
+    if (defaultTopics.length > 0) {
+      this.customTopics = defaultTopics.filter(t => !this.customTopics.includes(t));
     }
     this.bindEvents();
     this.showPage('home');
@@ -626,6 +671,24 @@ class ArchiveManager {
         }
       } catch (error) {
         console.error('browse error:', error);
+      }
+    });
+    document.getElementById('addDefaultTopicBtn')?.addEventListener('click', () => {
+      const input = document.getElementById('defaultTopicsInput');
+      if (!input) return;
+      const value = input.value.trim();
+      if (!value) return;
+      if (!this.settingsDefaultTopics) this.settingsDefaultTopics = [];
+      if (!this.settingsDefaultTopics.includes(value)) {
+        this.settingsDefaultTopics.push(value);
+        this.renderDefaultTopicsList();
+      }
+      input.value = '';
+    });
+    document.getElementById('defaultTopicsInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addDefaultTopicBtn')?.click();
       }
     });
 
