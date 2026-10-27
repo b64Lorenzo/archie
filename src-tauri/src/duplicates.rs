@@ -163,7 +163,7 @@ impl DuplicateFinder {
                 return Err("Cannot delete the last verified copy of a discovered duplicate group".into());
             }
         }
-        std::fs::remove_file(path).map_err(|e| format!("Failed to delete: {}", e))
+        trash::delete(&canonical).map_err(|e| format!("Failed to move to recycle bin: {}", e))
     }
 
     fn same_content(a: &str, b: &str) -> Result<bool, String> {

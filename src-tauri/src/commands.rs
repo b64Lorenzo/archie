@@ -111,8 +111,9 @@ pub fn delete_file(path: String) -> Result<(), String> {
     if !path.exists() {
         return Err("File not found".to_string());
     }
-    
+
     DuplicateFinder::delete_preserving_duplicates(path)?;
+    trash::delete(path).map_err(|e| format!("Failed to move to recycle bin: {}", e))?;
     Scanner::invalidate_cache();
     Ok(())
 }

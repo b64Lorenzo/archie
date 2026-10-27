@@ -8,6 +8,34 @@
 </head>
 <body>
     <div class="app">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-drag" data-tauri-drag-region>
+                <div class="title-bar-icon">
+                    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="36" rx="8" fill="currentColor" fill-opacity="0.1"/>
+                        <rect x="7" y="7" width="14" height="22" rx="3" fill="currentColor" fill-opacity="0.9"/>
+                        <rect x="13" y="9" width="14" height="20" rx="2" fill="#f0f0f5" fill-opacity="0.9"/>
+                        <line x1="10" y1="13" x2="17" y2="13" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <line x1="10" y1="17" x2="17" y2="17" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <line x1="10" y1="21" x2="17" y2="21" stroke="#0a0a0f" stroke-width="1.5" opacity="0.4"/>
+                        <polygon points="22,7 29,7 29,14 25.5,10.5 22,14" fill="#e5c07b"/>
+                    </svg>
+                </div>
+                <div class="title-bar-text">Archie</div>
+            </div>
+            <div class="title-bar-controls">
+                <button id="minimizeBtn" class="title-bar-btn" title="Minimize">
+                    <svg width="12" height="12" viewBox="0 0 12 12"><rect y="5" width="12" height="2" fill="currentColor"/></svg>
+                </button>
+                <button id="maximizeBtn" class="title-bar-btn" title="Maximize">
+                    <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+                <button id="closeBtn" class="title-bar-btn title-bar-close" title="Close">
+                    <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+            </div>
+        </div>
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -24,7 +52,7 @@
                 </div>
                 <div class="logo-text">
                     <div class="logo-title">Archie</div>
-                    <div class="logo-subtitle">v1.0.3</div>
+                    <div class="logo-subtitle">v1.0.5</div>
                 </div>
             </div>
             

@@ -65,8 +65,8 @@ class ArchiveManager {
         newFolder: 'New Folder',
         enterFileName: 'Enter file name:',
         enterFolderName: 'Enter folder name:',
-        confirmDelete: 'Delete this file?\n',
-        confirmDeleteFolder: 'Delete this folder?\n',
+        confirmDelete: 'Move to Recycle Bin?\n',
+        confirmDeleteFolder: 'Move this folder to Recycle Bin?\n',
         emptyTree: 'No directory selected',
         treeError: 'Error',
         noFilesFound: 'No files found',
@@ -121,8 +121,8 @@ class ArchiveManager {
         loadingTree: 'Loading tree...',
         loadingTopics: 'Loading topics...',
         errorPrefix: 'Error',
-        confirmDeleteDup: 'Delete this duplicate file?\n',
-        confirmDeleteAllDups: 'Delete ALL {count} copies?\nThis cannot be undone.',
+        confirmDelete: 'Move to Recycle Bin?\n',
+        confirmDeleteAllDups: 'Move ALL {count} copies to Recycle Bin?\nThis cannot be undone.',
         cannotDeleteLastCopy: 'Cannot delete the last verified copy of a discovered duplicate group',
         dupGroupsFound: 'groups found',
         topicCardTitle: '{topic}',
@@ -198,8 +198,8 @@ class ArchiveManager {
         newFolder: 'Nuova cartella',
         enterFileName: 'Inserisci nome file:',
         enterFolderName: 'Inserisci nome cartella:',
-        confirmDelete: 'Eliminare questo file?\n',
-        confirmDeleteFolder: 'Eliminare questa cartella?\n',
+        confirmDelete: 'Spostare nel Cestino?\n',
+        confirmDeleteFolder: 'Spostare questa cartella nel Cestino?\n',
         emptyTree: 'Nessuna directory selezionata',
         treeError: 'Errore',
         noFilesFound: 'Nessun file trovato',
@@ -253,8 +253,8 @@ class ArchiveManager {
         loadingTree: 'Caricamento albero...',
         loadingTopics: 'Caricamento argomenti...',
         errorPrefix: 'Errore',
-        confirmDeleteDup: 'Eliminare questo file duplicato?\n',
-        confirmDeleteAllDups: 'Eliminare TUTTI {count} copie?\nQuesto non puo essere annullato.',
+        confirmDeleteDup: 'Spostare nel Cestino questo file duplicato?\n',
+        confirmDeleteAllDups: 'Spostare TUTTI {count} copie nel Cestino?\nQuesto non puo essere annullato.',
         cannotDeleteLastCopy: 'Impossibile eliminare l\'ultima copia verificata di un gruppo duplicato',
         dupGroupsFound: 'gruppi trovati',
         topicCardTitle: '{topic}',
@@ -464,6 +464,26 @@ class ArchiveManager {
   }
 
   bindEvents() {
+    // Window controls
+    document.getElementById('minimizeBtn')?.addEventListener('click', async () => {
+      try {
+        const appWindow = window.__TAURI__?.window?.appWindow;
+        if (appWindow) await appWindow.minimize();
+      } catch (e) { console.error('minimize error:', e); }
+    });
+    document.getElementById('maximizeBtn')?.addEventListener('click', async () => {
+      try {
+        const appWindow = window.__TAURI__?.window?.appWindow;
+        if (appWindow) await appWindow.toggleMaximize();
+      } catch (e) { console.error('maximize error:', e); }
+    });
+    document.getElementById('closeBtn')?.addEventListener('click', async () => {
+      try {
+        const appWindow = window.__TAURI__?.window?.appWindow;
+        if (appWindow) await appWindow.close();
+      } catch (e) { console.error('close error:', e); }
+    });
+
     // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', (e) => {
@@ -1648,10 +1668,12 @@ class ArchiveManager {
   }
 
   async deleteFile(path, skipConfirm = false) {
-    if (!skipConfirm && !confirm(`Delete this file?\n${path}`)) return;
+    const isFolder = path.endsWith('/') || path.endsWith('\\');
+    const msg = isFolder ? this.t('confirmDeleteFolder') : this.t('confirmDelete');
+    if (!skipConfirm && !confirm(`${msg}${path}`)) return;
     try {
       await this.tauriInvoke('delete_file', { path });
-      this.updateStatus(`Deleted: ${path.split('/').pop()}`);
+      this.updateStatus(`${this.t('deleted')}: ${path.split(/[\\/]/).pop()}`);
       this.scanDirectory(true);
     } catch (error) {
       console.error('Delete error:', error);
@@ -1706,13 +1728,13 @@ class ArchiveManager {
         this.updateStatus(`Copied ${this.selectedDupFiles.length} paths`);
         break;
       case 'delete':
-        if (confirm(`Delete this duplicate file?\n${this.selectedDupFiles[0].path}`)) {
+        if (confirm(`${this.t('confirmDeleteDup')}\n${this.selectedDupFiles[0].path}`)) {
           this.deleteFile(this.selectedDupFiles[0].path, true);
           this.findDuplicates();
         }
         break;
       case 'deleteAll':
-        if (confirm(`Delete ALL ${this.selectedDupFiles.length} copies?\nThis cannot be undone.`)) {
+        if (confirm(`${this.t('confirmDeleteAllDups').replace('{count}', this.selectedDupFiles.length)}\n`)) {
           Promise.all(this.selectedDupFiles.map(f => this.deleteFile(f.path, true)))
             .then(() => this.findDuplicates());
         }
