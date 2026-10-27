@@ -1,6 +1,6 @@
 {
-  "name": "archive-manager",
-  "version": "1.0.2",
+  "name": "archie",
+  "version": "1.0.3",
   "description": "Archive Management System by Lorenzo Zambelli",
   "author": "Lorenzo Zambelli",
   "license": "MIT",

@@ -8,4 +8,4 @@ and commercial purposes. Redistribution and modification are allowed with
 proper attribution to the original author.
 
 Lorenzo Zambelli
-Archie v1.0.2
+Archie v1.0.3

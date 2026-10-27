@@ -1,6 +1,6 @@
 [package]
 name = "archie"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 authors = ["Lorenzo Zambelli"]
 description = "Archie - Archive and file management desktop app"

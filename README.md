@@ -1,6 +1,6 @@
 # Archie
 
-**Version 1.0.2**
+**Version 1.0.3**
 
 A modular, high-performance desktop application for file management, duplicate detection, and topic-based organization. Built with Tauri (Rust + TypeScript) for native performance and low resource usage.
 
@@ -62,11 +62,37 @@ npm run tauri dev
 ```
 
 ### Production Build
+
+#### Windows (NSIS installer)
 ```bash
 npm run tauri build
 ```
-
 Output: `src-tauri/target/release/archie.exe` and installer in `src-tauri/target/release/bundle/nsis/`
+
+#### macOS (DMG + App bundle)
+On macOS, run:
+```bash
+npm run tauri build -- --target dmg
+```
+Or for app bundle:
+```bash
+npm run tauri build -- --target app
+```
+Output: `src-tauri/target/release/archie.app` and DMG in `src-tauri/target/release/bundle/dmg/`
+
+#### Linux (AppImage, DEB, RPM)
+On Linux, run:
+```bash
+# AppImage
+npm run tauri build -- --target appimage
+
+# DEB package (Debian/Ubuntu)
+npm run tauri build -- --target deb
+
+# RPM package (Fedora/RHEL)
+npm run tauri build -- --target rpm
+```
+Output binaries are in `src-tauri/target/release/bundle/` under the respective format directory.
 
 ## License
 

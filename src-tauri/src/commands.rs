@@ -148,7 +148,7 @@ pub fn create_folder(path: String) -> Result<(), String> {
 pub fn get_app_info() -> AppInfo {
     AppInfo {
         name: "Archie".to_string(),
-        version: "1.0.2".to_string(),
+        version: "1.0.3".to_string(),
         author: "Lorenzo Zambelli".to_string(),
         license: "MIT".to_string(),
     }
