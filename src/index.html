@@ -49,10 +49,14 @@
                     <span class="nav-icon">❓</span>
                     <span class="nav-text" data-i18n="help">Help</span>
                 </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text" data-i18n="settings">Settings</span>
+                </a>
             </nav>
 
             <div class="sidebar-section">
-                <div class="sidebar-label" data-i18n="emptyTree">Directory Tree</div>
+                <div class="sidebar-label" id="treeLabel" data-i18n="emptyTree">Directory Tree</div>
                 <div class="tree-container">
                     <div id="directoryTree" class="tree"></div>
                 </div>
@@ -274,116 +278,31 @@
                 <!-- Help Page -->
                 <div id="page-help" class="page">
                     <div class="help-page">
-                        <div class="help-content">
-                            <h1 class="help-title">Help - How to Use Archie</h1>
-                            
-                            <div class="help-section">
-                                <h2>📂 Scanning Directories</h2>
-                                <p><strong>Home Page (Start):</strong> When you first open Archie, you'll see a clean screen with a large folder icon. Enter a directory path in the text field or click <strong>Browse</strong> to select a folder using the native file picker. Then click <strong>Scan Directory</strong>.</p>
-                                <p>Archie will recursively scan the selected folder and all its subfolders. Code directories (node_modules, venv, .git, etc.) are automatically excluded to speed up scanning.</p>
+                        <div class="help-content" id="helpContent"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="page-settings" class="page">
+                    <div class="settings-page">
+                        <h2 class="settings-title" data-i18n="settings">Settings</h2>
+                        <div class="settings-group">
+                            <label class="settings-label" data-i18n="defaultFolder">Default folder</label>
+                            <div class="settings-row">
+                                <input type="text" id="defaultFolderInput" class="settings-input" data-i18n-placeholder="defaultFolderPlaceholder" placeholder="Enter default scan folder path...">
+                                <button id="browseDefaultFolder" class="btn btn-secondary" data-i18n="browse">Browse</button>
                             </div>
-
-                            <div class="help-section">
-                                <h2>📊 Home Dashboard</h2>
-                                <p>After scanning, the Home page shows:</p>
-                                <ul>
-                                    <li><strong>Stat Cards:</strong> Total files, folders, size, duplicate groups, and code files.</li>
-                                    <li><strong>File Type Distribution:</strong> A doughnut chart showing the percentage of Documents, Code, Media, Archives, and Other files by size.</li>
-                                    <li><strong>Top 10 Extensions by Size:</strong> Horizontal bar chart showing which file extensions occupy the most space.</li>
-                                </ul>
-                                <p>Use the sidebar to navigate to <strong>Files</strong>, <strong>Duplicates</strong>, or <strong>Topics</strong>.</p>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>📄 Files View</h2>
-                                <p>The Files page lists all scanned files in a table. You can:</p>
-                                <ul>
-                                    <li><strong>Search:</strong> Use the search box at the top to filter files by name or path in real time.</li>
-                                    <li><strong>Filter by Type:</strong> Use the dropdown to show only Documents, Code, Media, Archives, or All.</li>
-                                    <li><strong>Sort:</strong> Click any column header (Name, Type, Size, Modified) to sort ascending/descending.</li>
-                                    <li><strong>Pagination:</strong> Navigate through pages if you have many files.</li>
-                                    <li><strong>Actions:</strong> Right-click any file for options:
-                                        <ul>
-                                            <li><strong>Open File:</strong> Opens the file with the default application.</li>
-                                            <li><strong>Open Folder:</strong> Opens the folder containing the file.</li>
-                                            <li><strong>Copy Path:</strong> Copies the full path to clipboard.</li>
-                                            <li><strong>Rename:</strong> Rename the file directly.</li>
-                                            <li><strong>Delete:</strong> Delete the file (with confirmation).</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>⚠️ Duplicates</h2>
-                                <p>Click <strong>Find Duplicates</strong> to scan for duplicate files. Archie compares files by size first, then by MD5 hash to confirm true duplicates.</p>
-                                <p><strong>Note:</strong> Cloud-only files (OneDrive placeholders) that can't be read are automatically skipped.</p>
-                                <p>For each duplicate group, you can:</p>
-                                <ul>
-                                    <li><strong>Open All:</strong> Open all copies at once.</li>
-                                    <li><strong>Delete This Copy / Delete All:</strong> Remove duplicates safely.</li>
-                                    <li><strong>Copy Paths:</strong> Copy all paths in the group.</li>
-                                    <li><strong>Show in Explorer:</strong> Reveal the file in Windows Explorer.</li>
-                                </ul>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>🌳 Directory Tree</h2>
-                                <p>The left sidebar always shows the directory tree of the currently scanned folder. You can:</p>
-                                <ul>
-                                    <li><strong>Expand/Collapse:</strong> Click the arrow ▶/▼ next to any folder.</li>
-                                    <li><strong>Select:</strong> Click a folder or file to select it. The top bar path updates.</li>
-                                    <li><strong>Double-click:</strong> Double-click a folder to scan it. Double-click a file to open it.</li>
-                                    <li><strong>Right-click:</strong> Access the same actions as in the Files table.</li>
-                                </ul>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>🏷️ Topics</h2>
-                                <p>Archie automatically groups files by topic based on their folder names and paths. You can:</p>
-                                <ul>
-                                    <li><strong>Search Topics:</strong> Use the search box to filter topics and their files.</li>
-                                    <li><strong>Add Custom Topic:</strong> Click <strong>+ Add Custom Topic</strong> to create a keyword-based topic. Any file whose name or path contains the keyword will appear under that topic.</li>
-                                    <li><strong>Edit Topic:</strong> Double-click a topic title to rename it.</li>
-                                    <li><strong>Delete Topic:</strong> Click the <strong>✕</strong> button on a topic card to remove it. This does not delete any files.</li>
-                                </ul>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>⚙️ General Tips</h2>
-                                <ul>
-                                    <li><strong>Scan Cache:</strong> Scans are cached for 10 minutes. Rescanning the same folder is instant unless you click <strong>Refresh</strong>.</li>
-                                    <li><strong>Language:</strong> Use the dropdown in the top bar to switch between English and Italian.</li>
-                                    <li><strong>Shortcuts:</strong> Press <strong>Enter</strong> in the path field to scan. Press <strong>Esc</strong> to close context menus.</li>
-                                    <li><strong>Performance:</strong> Large folders with thousands of files may take a few seconds. Parallel scanning is used automatically.</li>
-                                </ul>
-                            </div>
-
-                            <div class="help-section">
-                                <h2>📜 License</h2>
-                                <p>Archie is released under the MIT License.</p>
-                                <pre class="license-block">MIT License
-
-Copyright (c) 2026 Lorenzo Zambelli
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</pre>
-                            </div>
+                        </div>
+                        <div class="settings-group">
+                            <label class="settings-label" data-i18n="language">Language</label>
+                            <select id="settingsLanguageSelect" class="settings-select">
+                                <option value="en">English</option>
+                                <option value="it">Italiano</option>
+                            </select>
+                        </div>
+                        <div class="settings-actions">
+                            <button id="saveSettingsBtn" class="btn btn-primary" data-i18n="saveSettings">Save settings</button>
+                            <span id="settingsSavedText" class="settings-saved" data-i18n="settingsSaved">Settings saved</span>
                         </div>
                     </div>
                 </div>

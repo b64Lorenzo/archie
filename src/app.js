@@ -133,6 +133,30 @@ class ArchiveManager {
         deleteAllCopies: 'Delete All Copies',
         openAllLocations: 'Open All Locations',
         showInExplorer: 'Show in Explorer',
+        help: 'Help',
+        helpTitle: 'Help - How to Use Archie',
+        helpScanning: 'Scanning Directories',
+        helpScanningText: 'Home Page (Start): When you first open Archie, you\'ll see a clean screen with a large folder icon. Enter a directory path in the text field or click Browse to select a folder using the native file picker. Then click Scan Directory. Archie will recursively scan the selected folder and all its subfolders. Code directories (node_modules, venv, .git, etc.) are automatically excluded to speed up scanning.',
+        helpHomeDashboard: 'Home Dashboard',
+        helpHomeDashboardText: 'After scanning, the Home page shows: Stat Cards (total files, folders, size, duplicate groups, code files), File Type Distribution (doughnut chart), and Top 10 Extensions by Size. Use the sidebar to navigate to Files, Duplicates, or Topics.',
+        helpFilesView: 'Files View',
+        helpFilesViewText: 'The Files page lists all scanned files in a table. You can search, filter by type, sort by columns, navigate pages, and right-click for actions (Open File, Open Folder, Copy Path, Rename, Delete).',
+        helpDuplicates: 'Duplicates',
+        helpDuplicatesText: 'Click Find Duplicates to scan for duplicate files. Archie compares by size first, then by MD5 hash. Cloud-only files that can\'t be read are automatically skipped. For each group you can Open All, Delete copies, Copy Paths, or Show in Explorer.',
+        helpTree: 'Directory Tree',
+        helpTreeText: 'The left sidebar shows the directory tree of the scanned folder. You can expand/collapse folders, select items, double-click to scan/open, and right-click for actions.',
+        helpTopics: 'Topics',
+        helpTopicsText: 'Archie automatically groups files by topic based on folder names and paths. You can search topics, add custom keyword-based topics, rename topics by double-clicking, and delete topics.',
+        helpTips: 'General Tips',
+        helpTipsText: 'Scan Cache: Scans are cached for 10 minutes. Language: Use the dropdown to switch between English and Italian. Shortcuts: Press Enter to scan, Esc to close menus. Performance: Parallel scanning is used automatically.',
+        helpLicense: 'License',
+        helpLicenseText: 'Archie is released under the MIT License.',
+        settings: 'Settings',
+        defaultFolder: 'Default folder',
+        defaultFolderPlaceholder: 'Enter default scan folder path...',
+        saveSettings: 'Save settings',
+        settingsSaved: 'Settings saved',
+        cancel: 'Cancel',
       },
       it: {
         ready: 'Pronto',
@@ -241,6 +265,30 @@ class ArchiveManager {
         deleteAllCopies: 'Elimina tutte le copie',
         openAllLocations: 'Apri tutte le posizioni',
         showInExplorer: 'Mostra in Explorer',
+        help: 'Aiuto',
+        helpTitle: 'Aiuto - Come usare Archie',
+        helpScanning: 'Scansione delle directory',
+        helpScanningText: 'Home Page (Inizio): Quando apri Archie per la prima volta, vedrai una schermata pulita con una grande icona di cartella. Inserisci il percorso di una directory nel campo di testo o fai clic su Sfoglia per selezionare una cartella. Poi clicca Scansiona. Archie scansionerà ricorsivamente la cartella selezionata e tutte le sottocartelle. Le directory di codice (node_modules, venv, .git, ecc.) vengono automaticamente escluse per velocizzare la scansione.',
+        helpHomeDashboard: 'Home Dashboard',
+        helpHomeDashboardText: 'Dopo la scansione, la Home page mostra: Stat Cards (file totali, cartelle, dimensione, gruppi duplicati, file codice), Distribuzione per tipo di file (grafico a ciambella) e Top 10 estensioni per dimensione. Usa la barra laterale per navigare a File, Duplicati o Argomenti.',
+        helpFilesView: 'Visualizzazione File',
+        helpFilesViewText: 'La pagina File elenca tutti i file scansionati in una tabella. Puoi cercare, filtrare per tipo, ordinare per colonne, navigare le pagine e fare clic destro per azioni (Apri file, Apri cartella, Copia percorso, Rinomina, Elimina).',
+        helpDuplicates: 'Duplicati',
+        helpDuplicatesText: 'Clicca Trova duplicati per scansionare i file duplicati. Archie confronta prima per dimensione, poi per hash MD5. I file solo cloud non leggibili vengono saltati. Per ogni gruppo puoi Apri tutti, Elimina copie, Copia percorsi o Mostra in Explorer.',
+        helpTree: 'Albero directory',
+        helpTreeText: 'La barra laterale sinistra mostra l\'albero della directory scansionata. Puoi espandere/collassare le cartelle, selezionare gli elementi, fare doppio clic per scansionare/aprire e clic destro per le azioni.',
+        helpTopics: 'Argomenti',
+        helpTopicsText: 'Archie raggruppa automaticamente i file per argomento basandosi sui nomi delle cartelle e sui percorsi. Puoi cercare argomenti, aggiungere argomenti personalizzati basati su parole chiave, rinominare gli argomenti con doppio clic ed eliminarli.',
+        helpTips: 'Consigli generali',
+        helpTipsText: 'Cache scansione: Le scansioni sono memorizzate per 10 minuti. Lingua: Usa il menu a discesa per passare da Inglese a Italiano. Scorciatoie: Premi Invio per scansionare, Esc per chiudere i menu. Prestazioni: Viene usata automaticamente la scansione parallela.',
+        helpLicense: 'Licenza',
+        helpLicenseText: 'Archie è rilasciato sotto la licenza MIT.',
+        settings: 'Impostazioni',
+        defaultFolder: 'Cartella predefinita',
+        defaultFolderPlaceholder: 'Inserisci il percorso della cartella predefinita...',
+        saveSettings: 'Salva impostazioni',
+        settingsSaved: 'Impostazioni salvate',
+        cancel: 'Annulla',
       }
     };
 
@@ -262,6 +310,95 @@ class ArchiveManager {
     if (this.currentPath && ['home', 'files', 'duplicates', 'topics'].includes(view)) {
       await this.showPage(view);
     }
+    // Re-render help or settings if active
+    if (view === 'help') {
+      this.renderHelpPage();
+    } else if (view === 'settings') {
+      this.renderSettingsPage();
+    }
+  }
+
+  renderHelpPage() {
+    const container = document.getElementById('helpContent');
+    if (!container) return;
+    const t = this.t.bind(this);
+    container.innerHTML = `
+      <h1 class="help-title">${t('helpTitle')}</h1>
+      <div class="help-section">
+        <h2>📂 ${t('helpScanning')}</h2>
+        <p>${t('helpScanningText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>📊 ${t('helpHomeDashboard')}</h2>
+        <p>${t('helpHomeDashboardText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>📄 ${t('helpFilesView')}</h2>
+        <p>${t('helpFilesViewText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>⚠️ ${t('helpDuplicates')}</h2>
+        <p>${t('helpDuplicatesText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>🌳 ${t('helpTree')}</h2>
+        <p>${t('helpTreeText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>🏷️ ${t('helpTopics')}</h2>
+        <p>${t('helpTopicsText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>⚙️ ${t('helpTips')}</h2>
+        <p>${t('helpTipsText')}</p>
+      </div>
+      <div class="help-section">
+        <h2>📜 ${t('helpLicense')}</h2>
+        <p>${t('helpLicenseText')}</p>
+      </div>
+    `;
+  }
+
+  renderSettingsPage() {
+    const defaultFolderInput = document.getElementById('defaultFolderInput');
+    const languageSelect = document.getElementById('settingsLanguageSelect');
+    if (!defaultFolderInput || !languageSelect) return;
+    const settings = this.loadSettings();
+    defaultFolderInput.value = settings.defaultFolder || '';
+    languageSelect.value = settings.language || 'en';
+  }
+
+  loadSettings() {
+    try {
+      const raw = localStorage.getItem('archie-settings');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  saveSettings() {
+    const defaultFolderInput = document.getElementById('defaultFolderInput');
+    const languageSelect = document.getElementById('settingsLanguageSelect');
+    if (!defaultFolderInput || !languageSelect) return;
+    const settings = {
+      defaultFolder: defaultFolderInput.value.trim(),
+      language: languageSelect.value,
+    };
+    localStorage.setItem('archie-settings', JSON.stringify(settings));
+    if (settings.language && settings.language !== this.currentLanguage) {
+      this.setLanguage(settings.language);
+    }
+    const savedText = document.getElementById('settingsSavedText');
+    if (savedText) {
+      savedText.style.opacity = '1';
+      setTimeout(() => { savedText.style.opacity = '0'; }, 2000);
+    }
+  }
+
+  getDefaultFolder() {
+    const settings = this.loadSettings();
+    return settings.defaultFolder || '';
   }
 
   updateAllTexts() {
@@ -306,6 +443,12 @@ class ArchiveManager {
       this.currentLanguage = savedLang;
       const langSelect = document.getElementById('languageSelect');
       if (langSelect) langSelect.value = savedLang;
+    }
+    // Load default folder
+    const defaultFolder = this.getDefaultFolder();
+    if (defaultFolder) {
+      const homePathInput = document.getElementById('homePathInput');
+      if (homePathInput) homePathInput.value = defaultFolder;
     }
     this.bindEvents();
     this.showPage('home');
@@ -448,6 +591,22 @@ class ArchiveManager {
     // Language selector
     document.getElementById('languageSelect')?.addEventListener('change', (e) => {
       this.setLanguage(e.target.value);
+    });
+
+    // Settings page listeners
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', () => {
+      this.saveSettings();
+    });
+    document.getElementById('browseDefaultFolder')?.addEventListener('click', async () => {
+      try {
+        const result = await this.tauriInvoke('pick_folder', {});
+        if (result && result.length > 0) {
+          const input = document.getElementById('defaultFolderInput');
+          if (input) input.value = result;
+        }
+      } catch (error) {
+        console.error('browse error:', error);
+      }
     });
 
     // Autocomplete for search and path inputs
@@ -654,6 +813,10 @@ class ArchiveManager {
       this.showTopics();
     } else if (page === 'files') {
       this.renderFiles();
+    } else if (page === 'help') {
+      this.renderHelpPage();
+    } else if (page === 'settings') {
+      this.renderSettingsPage();
     }
   }
 
@@ -1610,8 +1773,11 @@ class ArchiveManager {
 
   async renderSidebarTree() {
     const treeContainer = document.getElementById('directoryTree');
+    const treeLabel = document.getElementById('treeLabel');
+    
     if (!this.currentPath) {
       treeContainer.innerHTML = '<div class="empty-state"><div class="empty-text">' + this.t('emptyTree') + '</div></div>';
+      if (treeLabel) treeLabel.textContent = this.t('emptyTree');
       return;
     }
 
@@ -1623,6 +1789,12 @@ class ArchiveManager {
 
       treeContainer.innerHTML = '';
       treeContainer.appendChild(this.buildTreeNode(tree));
+      
+      // Update label with current directory name
+      if (treeLabel) {
+        const folderName = this.currentPath.split(/[\\/]/).filter(Boolean).pop() || this.currentPath;
+        treeLabel.textContent = folderName;
+      }
     } catch (error) {
       console.error('tree error:', error);
       treeContainer.innerHTML = `<div class="empty-state"><div class="empty-text">${this.t('errorPrefix')}: ${this.escapeHtml(error)}</div></div>`;
