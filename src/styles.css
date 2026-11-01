@@ -1075,7 +1075,7 @@ body.page-home-dashboard .home-back-btn {
 }
 
 /* Bounded flex children are required for independent scrolling. */
-.main, .pages, .page, .sidebar-section, .tree-container, .table-container,
+.app, .sidebar, .main, .pages, .page, .sidebar-section, .tree-container, .table-container,
 .topics-container, .home-page { min-height: 0; min-width: 0; }
 .header, .page-toolbar, .pagination, .status-bar, .sidebar-nav,
 .sidebar-header, .sidebar-footer { flex-shrink: 0; }

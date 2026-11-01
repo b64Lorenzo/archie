@@ -1,6 +1,6 @@
 # Archie
 
-**Version 1.0.3**
+**Version 1.0.7**
 
 A modular, high-performance desktop application for file management, duplicate detection, and topic-based organization. Built with Tauri (Rust + TypeScript) for native performance and low resource usage.
 
