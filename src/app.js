@@ -512,19 +512,19 @@ class ArchiveManager {
     // Window controls
     document.getElementById('minimizeBtn')?.addEventListener('click', async () => {
       try {
-        const appWindow = window.__TAURI__?.window?.appWindow;
+        const appWindow = window.__TAURI__?.window?.getCurrentWindow?.();
         if (appWindow) await appWindow.minimize();
       } catch (e) { console.error('minimize error:', e); }
     });
     document.getElementById('maximizeBtn')?.addEventListener('click', async () => {
       try {
-        const appWindow = window.__TAURI__?.window?.appWindow;
+        const appWindow = window.__TAURI__?.window?.getCurrentWindow?.();
         if (appWindow) await appWindow.toggleMaximize();
       } catch (e) { console.error('maximize error:', e); }
     });
     document.getElementById('closeBtn')?.addEventListener('click', async () => {
       try {
-        const appWindow = window.__TAURI__?.window?.appWindow;
+        const appWindow = window.__TAURI__?.window?.getCurrentWindow?.();
         if (appWindow) await appWindow.close();
       } catch (e) { console.error('close error:', e); }
     });

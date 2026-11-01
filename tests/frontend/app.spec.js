@@ -46,11 +46,16 @@ test('empty scans render usable dashboard and Files empty state',async({page})=>
  await expect(page.locator('#typeSummary')).toContainText('No files');await page.locator('[data-page="files"]').click();await expect(page.locator('#filesTableBody')).toContainText('No files found');expect(errors).toEqual([]);
 });
 test('CSV exports all filtered rows with quoting and formula protection',async({page})=>{
- await setup(page); await page.evaluate(()=>window.fixtureFiles.push({name:'=1+1.csv',path:'C:\\Archive\\=1+1.csv',file_type:'Other',size:0,modified:'unknown'}));await scan(page);
- await page.locator('[data-page="files"]').click();await page.locator('#searchInput').fill('=1+1');
- const download=page.waitForEvent('download');await page.locator('#exportCsvBtn').click();const item=await download;
- const stream=await item.createReadStream();let data='';for await(const chunk of stream)data+=chunk.toString();
- expect(data).toContain('"\'=1+1.csv"');expect(data).not.toContain('outside.txt');expect(data).toContain('Name,Path,Type,Size,Modified');
+ await setup(page);
+ await page.evaluate(()=>{
+  window.exportedCsv={blob:null,filename:null};
+  URL.createObjectURL=blob=>{window.exportedCsv.blob=blob;return 'blob:playwright-csv';};
+  HTMLAnchorElement.prototype.click=function(){window.exportedCsv.filename=this.download;};
+ });
+ await page.evaluate(()=>window.fixtureFiles.push({name:'=1+1.csv',path:'C:\\Archive\\=1+1.csv',file_type:'Other',size:0,modified:'unknown'}));await scan(page);
+ await page.locator('[data-page="files"]').click();await page.locator('#searchInput').fill('=1+1');await page.locator('#exportCsvBtn').click();
+ const exported=await page.evaluate(async()=>({filename:window.exportedCsv.filename,data:await window.exportedCsv.blob.text()}));
+ expect(exported.filename).toBe('archive-inventory.csv');expect(exported.data).toContain('"\'=1+1.csv"');expect(exported.data).not.toContain('outside.txt');expect(exported.data).toContain('Name,Path,Type,Size,Modified');
 });
 test('topic edits survive navigation and search reuses scan-scoped topics',async({page})=>{
  await setup(page); await scan(page); await page.locator('[data-page="topics"]').click();
@@ -76,9 +81,23 @@ test('all long subviews scroll within viewport while navigation remains visible'
  await setup(page); await page.setViewportSize({width:1000,height:600});
  await page.evaluate(()=>{window.fixtureFiles=Array.from({length:130},(_,i)=>({...window.fixtureFiles[0],name:'note '+i,path:'C:\\Archive\\file'+i})); const invoke=window.__TAURI__.core.invoke;window.__TAURI__.core.invoke=async(c,a)=>{if(c==='get_topics')return {topics:Array.from({length:30},(_,i)=>({topic:'Topic '+i,files:window.fixtureFiles,count:130}))};if(c==='get_tree')return {name:'Archive',type:'folder',path:'C:\\Archive',children:Array.from({length:90},(_,i)=>({name:'Folder '+i,path:'C:\\Archive\\folder'+i,type:'folder',children:[]}))};if(c==='find_duplicates')return {total_groups:30,duplicates:Array.from({length:30},(_,i)=>({name:'Duplicate '+i,count:2,total_size:100,files:window.fixtureFiles.slice(0,2)}))};return invoke(c,a);};});
  await scan(page);
- async function scrollable(selector){ const result=await page.locator(selector).evaluate(el=>{el.scrollTop=el.scrollHeight;return {scrolled:el.scrollTop>0,bottom:el.getBoundingClientRect().bottom}});expect(result.scrolled).toBe(true);expect(result.bottom).toBeLessThanOrEqual(600); }
+ async function scrollable(selector){ const result=await page.locator(selector).evaluate(el=>{el.scrollTop=el.scrollHeight;return {scrollTop:el.scrollTop,bottom:el.getBoundingClientRect().bottom}});expect(result.scrollTop).toBeGreaterThan(0);expect(result.bottom).toBeLessThanOrEqual(600); }
  await scrollable('.home-page');
- await page.locator('.tree-arrow').first().click(); await scrollable('.tree-container');
+ await page.locator('.home-page').evaluate(el=>el.scrollTop=0);
+ const homePageScrollBeforeTree=await page.locator('.home-page').evaluate(el=>el.scrollTop);
+ const sidebarScrollBeforeTree=await page.locator('.sidebar').evaluate(el=>el.scrollTop);
+ const mainScrollBeforeTree=await page.locator('.main').evaluate(el=>el.scrollTop);
+ await page.locator('.tree-arrow').first().click();
+ const treeContainer=page.locator('.tree-container'); const treeBox=await treeContainer.boundingBox();
+ for(let i=0;i<5;i++){await page.mouse.move(treeBox.x+treeBox.width/2,treeBox.y+treeBox.height/2);await page.mouse.wheel(0,1200);}
+ await expect.poll(()=>treeContainer.evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+ const lastTreeItem=treeContainer.locator('.tree-item').last(); await expect(lastTreeItem).toContainText('Folder 89');
+ const lastTreeItemBottom=await lastTreeItem.evaluate(el=>el.getBoundingClientRect().bottom);
+ const treeContainerBottom=await treeContainer.evaluate(el=>el.getBoundingClientRect().bottom);
+ expect(lastTreeItemBottom).toBeLessThanOrEqual(treeContainerBottom);
+ expect(await page.locator('.home-page').evaluate(el=>el.scrollTop)).toBe(homePageScrollBeforeTree);
+ expect(await page.locator('.sidebar').evaluate(el=>el.scrollTop)).toBe(sidebarScrollBeforeTree);
+ expect(await page.locator('.main').evaluate(el=>el.scrollTop)).toBe(mainScrollBeforeTree);
  await page.locator('[data-page="files"]').click(); await scrollable('#page-files .table-container');
  await page.locator('[data-page="topics"]').click(); await expect(page.locator('.topic-card')).toHaveCount(30); await scrollable('#topicsContainer');
  await page.locator('[data-page="duplicates"]').click(); await page.locator('#findDupsBtn').click(); await expect(page.locator('#duplicatesTableBody tr[data-files]')).toHaveCount(30); await scrollable('#page-duplicates .table-container');
@@ -125,4 +144,21 @@ test('scan survives Home navigation and populates Files without errors',async({p
  await page.locator('[data-page="files"]').click(); await expect(page.locator('#filesTableBody tr[data-path]')).toHaveCount(3);
  await page.locator('[data-page="home"]').click(); await page.locator('[data-page="files"]').click();
  await expect(page.locator('#filesTableBody tr[data-path]')).toHaveCount(3); expect(errors).toEqual([]);
+});
+test('custom window buttons invoke minimize, maximize toggle, and close on the current Tauri window',async({page})=>{
+ await setup(page);
+ await page.evaluate(()=>{
+  window.windowActions=[];
+  const appWindow={
+   minimize:async()=>window.windowActions.push('minimize'),
+   toggleMaximize:async()=>window.windowActions.push('toggleMaximize'),
+   close:async()=>window.windowActions.push('close')
+  };
+  window.__TAURI__.window={getCurrentWindow:()=>appWindow};
+ });
+ await page.locator('#minimizeBtn').click();
+ await page.locator('#maximizeBtn').click();
+ await page.locator('#maximizeBtn').click();
+ await page.locator('#closeBtn').click();
+ expect(await page.evaluate(()=>window.windowActions)).toEqual(['minimize','toggleMaximize','toggleMaximize','close']);
 });

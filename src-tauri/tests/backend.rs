@@ -1,4 +1,4 @@
-use archive_manager::{commands, scanner::Scanner, duplicates::DuplicateFinder, utils::FileType};
+use archie::{commands, scanner::Scanner, duplicates::DuplicateFinder, utils::FileType};
 use std::{path::PathBuf, sync::atomic::{AtomicUsize, Ordering}};
 static NEXT: AtomicUsize = AtomicUsize::new(0);
 struct Fixture(PathBuf);
